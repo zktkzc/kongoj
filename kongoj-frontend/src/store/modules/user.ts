@@ -1,4 +1,5 @@
 import { StoreOptions } from "vuex";
+import ACCESS_ENUM from "@/access/accessEnum";
 
 /**
  * 存储的状态信息
@@ -6,7 +7,7 @@ import { StoreOptions } from "vuex";
 const state = () => ({
   loginUser: {
     userName: "未登录",
-    role: "notLogin",
+    userRole: ACCESS_ENUM.NOT_LOGIN,
   },
 });
 
