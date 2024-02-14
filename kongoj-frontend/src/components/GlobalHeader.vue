@@ -24,7 +24,7 @@ setTimeout(() => {
 </script>
 
 <template>
-  <a-row id="globalHeader" align="center">
+  <a-row id="globalHeader" align="center" :wrap="false">
     <a-col flex="auto">
       <a-menu
         mode="horizontal"
