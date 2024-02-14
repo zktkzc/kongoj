@@ -15,6 +15,9 @@ const routes: Array<RouteRecordRaw> = [
     path: "/noAuth",
     name: "无权限",
     component: () => import("../views/NoAuthView.vue"),
+    meta: {
+      hideInMenu: true,
+    },
   },
   {
     path: "/admin",

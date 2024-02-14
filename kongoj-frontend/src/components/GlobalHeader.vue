@@ -5,6 +5,7 @@ import { ref } from "vue";
 import { useStore } from "vuex";
 
 const router = useRouter();
+const visibleRoutes = routes.filter((route, index) => !route.meta?.hideInMenu);
 const selectedKeys = ref(["/"]);
 router.afterEach((to, from, failure) => {
   selectedKeys.value = [to.path];
@@ -37,7 +38,7 @@ setTimeout(() => {
             <div class="title">空 OJ</div>
           </div>
         </a-menu-item>
-        <a-menu-item v-for="route in routes" :key="route.path"
+        <a-menu-item v-for="route in visibleRoutes" :key="route.path"
           >{{ route.name }}
         </a-menu-item>
       </a-menu>
