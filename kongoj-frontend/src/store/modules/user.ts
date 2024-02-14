@@ -6,6 +6,7 @@ import { StoreOptions } from "vuex";
 const state = () => ({
   loginUser: {
     userName: "未登录",
+    role: "notLogin",
   },
 });
 

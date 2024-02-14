@@ -18,6 +18,7 @@ const store = useStore();
 setTimeout(() => {
   store.dispatch("user/getLoginUser", {
     userName: "天空之城",
+    role: "admin",
   });
 }, 3000);
 </script>
