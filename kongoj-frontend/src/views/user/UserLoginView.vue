@@ -45,7 +45,12 @@ const handleSubmit = async () => {
       auto-label-width
       style="max-width: 480px; margin: 0 auto"
     >
-      <a-form-item label="账号" tooltip="请输入账号" field="userAccount">
+      <a-form-item
+        label="账号"
+        tooltip="请输入账号"
+        field="userAccount"
+        rules="required"
+      >
         <a-input v-model="form.userAccount" placeholder="请输入账号" />
       </a-form-item>
       <a-form-item
