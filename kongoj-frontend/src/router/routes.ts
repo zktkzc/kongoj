@@ -25,7 +25,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "主页",
-    component: () => import("../views/HomeView.vue"),
+    component: () => import("../views/ExanpleView.vue"),
   },
   {
     path: "/about",
