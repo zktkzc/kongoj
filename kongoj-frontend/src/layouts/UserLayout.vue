@@ -3,7 +3,12 @@
 <template>
   <div id="userLayout">
     <a-layout style="min-height: 100vh">
-      <a-layout-header class="header"> 用户布局 </a-layout-header>
+      <a-layout-header class="header">
+        <a-space>
+          <img class="logo" src="@/assets/oj-logo.svg" alt="logo" />
+          <div class="title">空 OJ</div>
+        </a-space>
+      </a-layout-header>
       <a-layout-content class="content">
         <router-view />
       </a-layout-content>
@@ -18,20 +23,27 @@
 
 <style scoped>
 #userLayout {
+  text-align: center;
 }
 
 #userLayout .header {
-  box-shadow: #eee 1px 1px 5px;
+  margin-top: 16px;
+}
+
+#userLayout .header .logo {
+  width: 64px;
+  height: 64px;
+}
+
+#userLayout .header .title {
 }
 
 #userLayout .content {
-  background: linear-gradient(to right, #bbb, #fff);
   margin-bottom: 16px;
   padding: 20px;
 }
 
 #userLayout .footer {
-  background: #efefef;
   padding: 16px;
   position: sticky;
   bottom: 0;

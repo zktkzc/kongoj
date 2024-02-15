@@ -6,6 +6,9 @@ const routes: Array<RouteRecordRaw> = [
     path: "/user",
     name: "用户",
     component: () => import("../layouts/UserLayout.vue"),
+    meta: {
+      hideInMenu: true,
+    },
     children: [
       {
         path: "/user/login",

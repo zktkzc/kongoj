@@ -36,11 +36,14 @@ const handleSubmit = async () => {
 
 <template>
   <div id="userLogin">
+    <h2 style="margin-bottom: 16px">用户登录</h2>
     <a-form
       :form="form"
-      style="width: 600px"
       @submit="handleSubmit"
       rules="required"
+      label-align="left"
+      auto-label-width
+      style="max-width: 480px; margin: 0 auto"
     >
       <a-form-item label="账号" tooltip="请输入账号" field="userAccount">
         <a-input v-model="form.userAccount" placeholder="请输入账号" />
@@ -57,7 +60,9 @@ const handleSubmit = async () => {
         />
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit">登录</a-button>
+        <a-button type="primary" html-type="submit" style="width: 480px">
+          登录
+        </a-button>
       </a-form-item>
     </a-form>
   </div>
