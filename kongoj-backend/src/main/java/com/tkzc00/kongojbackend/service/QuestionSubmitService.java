@@ -1,9 +1,19 @@
 package com.tkzc00.kongojbackend.service;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.tkzc00.kongojbackend.model.dto.question.QuestionQueryRequest;
 import com.tkzc00.kongojbackend.model.dto.questionSubmit.QuestionSubmitAddRequest;
+import com.tkzc00.kongojbackend.model.dto.questionSubmit.QuestionSubmitQueryRequest;
+import com.tkzc00.kongojbackend.model.entity.Question;
 import com.tkzc00.kongojbackend.model.entity.QuestionSubmit;
 import com.tkzc00.kongojbackend.model.entity.User;
+import com.tkzc00.kongojbackend.model.vo.QuestionSubmitVO;
+import com.tkzc00.kongojbackend.model.vo.QuestionVO;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * @author tkzc00
@@ -13,4 +23,10 @@ import com.tkzc00.kongojbackend.model.entity.User;
 public interface QuestionSubmitService extends IService<QuestionSubmit> {
 
     long doQuestionSubmit(QuestionSubmitAddRequest questionId, User loginUser);
+
+    QuestionSubmitVO getQuestionSubmitVO(QuestionSubmit questionSubmit, User loginUser);
+
+    QueryWrapper<QuestionSubmit> getQueryWrapper(QuestionSubmitQueryRequest questionSubmitQueryRequest);
+
+    Page<QuestionSubmitVO> getQuestionSubmitVOPage(Page<QuestionSubmit> questionSubmitPage, User loginUser);
 }

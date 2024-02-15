@@ -1,11 +1,19 @@
 package com.tkzc00.kongojbackend.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.tkzc00.kongojbackend.annotation.AuthCheck;
 import com.tkzc00.kongojbackend.common.BaseResponse;
 import com.tkzc00.kongojbackend.common.ErrorCode;
 import com.tkzc00.kongojbackend.common.ResultUtils;
+import com.tkzc00.kongojbackend.constant.UserConstant;
 import com.tkzc00.kongojbackend.exception.BusinessException;
+import com.tkzc00.kongojbackend.model.dto.question.QuestionQueryRequest;
 import com.tkzc00.kongojbackend.model.dto.questionSubmit.QuestionSubmitAddRequest;
+import com.tkzc00.kongojbackend.model.dto.questionSubmit.QuestionSubmitQueryRequest;
+import com.tkzc00.kongojbackend.model.entity.Question;
+import com.tkzc00.kongojbackend.model.entity.QuestionSubmit;
 import com.tkzc00.kongojbackend.model.entity.User;
+import com.tkzc00.kongojbackend.model.vo.QuestionSubmitVO;
 import com.tkzc00.kongojbackend.service.QuestionSubmitService;
 import com.tkzc00.kongojbackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +53,23 @@ public class QuestionSubmitController {
         final User loginUser = userService.getLoginUser(request);
         long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
         return ResultUtils.success(questionSubmitId);
+    }
+
+    /**
+     * 分页获取列表（除了管理员外，普通用户只能看到非答案、提交代码等公开信息）
+     *
+     * @param questionSubmitQueryRequest
+     * @return
+     */
+    @PostMapping("/list/page")
+    public BaseResponse<Page<QuestionSubmitVO>> listQuestionSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest, HttpServletRequest request) {
+        long current = questionSubmitQueryRequest.getCurrent();
+        long size = questionSubmitQueryRequest.getPageSize();
+        Page<QuestionSubmit> questionSubmitPage = questionSubmitService.page(new Page<>(current, size),
+                questionSubmitService.getQueryWrapper(questionSubmitQueryRequest));
+        User loginUser = userService.getLoginUser(request);
+        // 返回脱敏信息
+        return ResultUtils.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, loginUser));
     }
 
 }
