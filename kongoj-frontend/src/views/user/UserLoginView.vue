@@ -36,7 +36,7 @@ const handleSubmit = async () => {
 
 <template>
   <div id="userLogin">
-    <h2 style="margin-bottom: 16px">用户登录</h2>
+    <h1 style="margin-bottom: 16px">用户登录</h1>
     <a-form
       :form="form"
       @submit="handleSubmit"

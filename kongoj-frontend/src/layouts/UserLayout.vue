@@ -36,6 +36,7 @@
 }
 
 #userLayout .header .title {
+  font-size: 24px;
 }
 
 #userLayout .content {
