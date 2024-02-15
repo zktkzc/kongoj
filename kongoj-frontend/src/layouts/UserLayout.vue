@@ -13,9 +13,9 @@
         <router-view />
       </a-layout-content>
       <a-layout-footer class="footer">
-        <a href="https://github.com/zktkzc" target="_blank"
-          >空OJ-在线判题系统 by tkzc00</a
-        >
+        <a href="https://github.com/zktkzc" target="_blank">
+          空OJ-在线判题系统 by tkzc00
+        </a>
       </a-layout-footer>
     </a-layout>
   </div>
@@ -51,5 +51,10 @@
   left: 0;
   right: 0;
   text-align: center;
+}
+
+.footer a {
+  text-decoration: none;
+  color: #444;
 }
 </style>

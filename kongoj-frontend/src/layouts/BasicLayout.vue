@@ -43,4 +43,9 @@ import GlobalHeader from "@/components/GlobalHeader.vue";
   right: 0;
   text-align: center;
 }
+
+.footer a {
+  text-decoration: none;
+  color: #444;
+}
 </style>
