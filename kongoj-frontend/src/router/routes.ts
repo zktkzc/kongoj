@@ -3,6 +3,23 @@ import ACCESS_ENUM from "@/access/accessEnum";
 
 const routes: Array<RouteRecordRaw> = [
   {
+    path: "/user",
+    name: "用户",
+    component: () => import("../layouts/UserLayout.vue"),
+    children: [
+      {
+        path: "/user/login",
+        name: "用户登录",
+        component: () => import("../views/user/UserLoginView.vue"),
+      },
+      {
+        path: "/user/register",
+        name: "用户注册",
+        component: () => import("../views/user/UserRegisterView.vue"),
+      },
+    ],
+  },
+  {
     path: "/",
     name: "主页",
     component: () => import("../views/HomeView.vue"),
