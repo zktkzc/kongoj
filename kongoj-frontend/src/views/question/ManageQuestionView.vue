@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 import { Question, QuestionControllerService } from "../../../generated";
 import message from "@arco-design/web-vue/es/message";
 import { useRouter } from "vue-router";
@@ -62,7 +62,7 @@ const columns = [
 ];
 const total = ref(0);
 const searchParams = ref({
-  pageNum: 1,
+  current: 1,
   pageSize: 10,
 });
 const loadData = async () => {
@@ -76,6 +76,12 @@ const loadData = async () => {
     message.error("获取题目列表失败：" + res.message);
   }
 };
+/**
+ * 监听 searchParams 的变化，改变时触发页面的重新加载
+ */
+watchEffect(() => {
+  loadData();
+});
 onMounted(() => {
   loadData();
 });
@@ -99,6 +105,12 @@ const doDelete = async (question: Question) => {
     message.error("删除失败：" + res.message);
   }
 };
+const onPageChange = (page: number) => {
+  searchParams.value = {
+    ...searchParams.value,
+    current: page,
+  };
+};
 </script>
 
 <template>
@@ -109,10 +121,11 @@ const doDelete = async (question: Question) => {
       :data="dataList"
       :pagination="{
         pageSize: searchParams.pageSize,
-        current: searchParams.pageNum,
+        current: searchParams.current,
         total,
         showTotal: true,
       }"
+      @page-change="onPageChange"
     >
       <template #optional="{ record }">
         <a-space>

@@ -32,7 +32,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "添加题目",
     component: () => import("../views/question/AddQuestionView.vue"),
     meta: {
-      access: ACCESS_ENUM.ADMIN,
+      access: ACCESS_ENUM.USER,
     },
   },
   {
@@ -40,7 +40,8 @@ const routes: Array<RouteRecordRaw> = [
     name: "更新题目",
     component: () => import("../views/question/AddQuestionView.vue"),
     meta: {
-      access: ACCESS_ENUM.ADMIN,
+      access: ACCESS_ENUM.USER,
+      hideInMenu: true,
     },
   },
   {
@@ -52,25 +53,12 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: "/about",
-    name: "关于",
-    component: () => import("../views/AdminView.vue"),
-  },
-  {
     path: "/noAuth",
     name: "无权限",
     component: () => import("../views/NoAuthView.vue"),
     meta: {
       hideInMenu: true,
     },
-  },
-  {
-    path: "/admin",
-    name: "管理员可见",
-    meta: {
-      access: ACCESS_ENUM.ADMIN,
-    },
-    component: () => import("../views/AdminView.vue"),
   },
 ];
 
