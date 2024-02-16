@@ -28,6 +28,30 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/ExanpleView.vue"),
   },
   {
+    path: "/add/question",
+    name: "添加题目",
+    component: () => import("../views/question/AddQuestionView.vue"),
+    meta: {
+      access: ACCESS_ENUM.ADMIN,
+    },
+  },
+  {
+    path: "/update/question",
+    name: "更新题目",
+    component: () => import("../views/question/AddQuestionView.vue"),
+    meta: {
+      access: ACCESS_ENUM.ADMIN,
+    },
+  },
+  {
+    path: "/manage/question",
+    name: "管理题目",
+    component: () => import("../views/question/ManageQuestionView.vue"),
+    meta: {
+      access: ACCESS_ENUM.ADMIN,
+    },
+  },
+  {
     path: "/about",
     name: "关于",
     component: () => import("../views/AdminView.vue"),

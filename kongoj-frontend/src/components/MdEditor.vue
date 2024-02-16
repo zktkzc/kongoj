@@ -10,6 +10,7 @@ import gfm from "@bytemd/plugin-gfm";
 interface Props {
   value: string;
   handleChange: (v: string) => void;
+  mode?: string;
 }
 
 /**
@@ -17,6 +18,7 @@ interface Props {
  */
 const props = withDefaults(defineProps<Props>(), {
   value: () => "",
+  mode: () => "split",
   handleChange: (v: string) => {
     console.log(v);
   },
@@ -25,7 +27,16 @@ const plugins = [gfm(), highlight()];
 </script>
 
 <template>
-  <Editor :value="value" @plugin="plugins" @change="handleChange" />
+  <Editor
+    :mode="props.mode"
+    :value="props.value"
+    @plugin="plugins"
+    @change="props.handleChange"
+  />
 </template>
 
-<style scoped></style>
+<style>
+.bytemd-toolbar-icon.bytemd-tippy.bytemd-tippy-right:last-child {
+  display: none;
+}
+</style>
