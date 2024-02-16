@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.tkzc00.kongojbackend.common.ErrorCode;
 import com.tkzc00.kongojbackend.constant.CommonConstant;
 import com.tkzc00.kongojbackend.exception.BusinessException;
+import com.tkzc00.kongojbackend.judge.JudgeService;
 import com.tkzc00.kongojbackend.mapper.QuestionSubmitMapper;
 import com.tkzc00.kongojbackend.model.dto.questionSubmit.QuestionSubmitAddRequest;
 import com.tkzc00.kongojbackend.model.dto.questionSubmit.QuestionSubmitQueryRequest;
@@ -24,13 +25,12 @@ import com.tkzc00.kongojbackend.service.UserService;
 import com.tkzc00.kongojbackend.utils.SqlUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +45,9 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
     private QuestionService questionService;
     @Resource
     private UserService userService;
+    @Resource
+    @Lazy
+    private JudgeService judgeService;
 
     @Override
     public long doQuestionSubmit(QuestionSubmitAddRequest questionSubmitAddRequest, User loginUser) {
@@ -72,7 +75,12 @@ public class QuestionSubmitServiceImpl extends ServiceImpl<QuestionSubmitMapper,
         if (!success) {
             throw new BusinessException(ErrorCode.SYSTEM_ERROR);
         }
-        return questionSubmit.getId();
+        // 执行判题服务
+        Long questionSubmitId = questionSubmit.getId();
+        CompletableFuture.runAsync(() -> {
+            judgeService.doJudge(questionSubmitId);
+        });
+        return questionSubmitId;
     }
 
     @Override

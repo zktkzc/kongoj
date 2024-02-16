@@ -1,6 +1,7 @@
 package com.tkzc00.kongojbackend.judge.codeSandbox.model;
 
 import com.tkzc00.kongojbackend.model.dto.question.JudgeConfig;
+import com.tkzc00.kongojbackend.model.dto.questionSubmit.JudgeInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,5 +29,5 @@ public class ExecuteCodeResponse {
     /**
      * 判题信息
      */
-    private JudgeConfig judgeConfig;
+    private JudgeInfo judgeInfo;
 }
