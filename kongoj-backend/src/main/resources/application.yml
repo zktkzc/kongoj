@@ -101,3 +101,6 @@ knife4j:
         api-rule-resources:
           - com.tkzc00.kongojbackend.controller
     concat: "tkzc00"
+# 代码沙箱配置
+codesandbox:
+  type: example
