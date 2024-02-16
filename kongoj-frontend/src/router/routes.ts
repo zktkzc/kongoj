@@ -25,7 +25,12 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "主页",
-    component: () => import("../views/ExanpleView.vue"),
+    component: () => import("../views/question/QuestionsView.vue"),
+  },
+  {
+    path: "/questions",
+    name: "浏览题目",
+    component: () => import("../views/question/QuestionsView.vue"),
   },
   {
     path: "/add/question",

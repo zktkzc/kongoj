@@ -36,6 +36,10 @@ const columns = [
     dataIndex: "content",
   },
   {
+    title: "答案",
+    dataIndex: "answer",
+  },
+  {
     title: "提交数",
     dataIndex: "submitNum",
   },
