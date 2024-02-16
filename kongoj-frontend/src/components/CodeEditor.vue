@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import * as monaco from "monaco-editor";
-import { onMounted, ref, toRaw, defineProps, withDefaults } from "vue";
+import { defineProps, onMounted, ref, toRaw, watch, withDefaults } from "vue";
 
 interface Props {
   value: string;
   handleChange: (v: string) => void;
+  language: string;
 }
 
 /**
@@ -15,7 +16,26 @@ const props = withDefaults(defineProps<Props>(), {
   handleChange: (v: string) => {
     console.log(v);
   },
+  language: "java",
 });
+
+watch(
+  () => props.language,
+  () => {
+    codeEditor.value = monaco.editor.create(codeEditorRef.value, {
+      value: props.value,
+      language: props.language,
+      automaticLayout: true,
+      lineNumbers: "on",
+      readOnly: false,
+      theme: "vs-dark",
+      colorDecorators: true,
+      minimap: {
+        enabled: true,
+      },
+    });
+  }
+);
 
 const codeEditorRef = ref();
 const codeEditor = ref();
@@ -23,7 +43,7 @@ onMounted(() => {
   if (!codeEditorRef.value) return;
   codeEditor.value = monaco.editor.create(codeEditorRef.value, {
     value: props.value,
-    language: "java",
+    language: props.language,
     automaticLayout: true,
     lineNumbers: "on",
     readOnly: false,

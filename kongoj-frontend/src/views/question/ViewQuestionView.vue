@@ -1,0 +1,149 @@
+<script setup lang="ts">
+import { defineProps, onMounted, ref, withDefaults } from "vue";
+import {
+  QuestionControllerService,
+  QuestionSubmitAddRequest,
+  QuestionSubmitControllerService,
+  QuestionVO,
+} from "../../../generated";
+import message from "@arco-design/web-vue/es/message";
+import CodeEditor from "@/components/CodeEditor.vue";
+import MdViewer from "@/components/MdViewer.vue";
+
+interface Props {
+  id: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  id: "",
+});
+const question = ref<QuestionVO>();
+const form = ref<QuestionSubmitAddRequest>({
+  language: "java",
+  code: "",
+});
+const loadData = async () => {
+  const res = await QuestionControllerService.getQuestionVoByIdUsingGet(
+    props.id as any
+  );
+  if (res.code === 0) {
+    question.value = res.data;
+  } else {
+    message.error("获取题目详情失败：" + res.message);
+  }
+};
+onMounted(() => {
+  loadData();
+});
+/**
+ * 提交代码
+ */
+const doSubmit = async () => {
+  if (!props.id || !question.value?.id) {
+    message.error("题目不存在");
+    return;
+  }
+  const res = await QuestionSubmitControllerService.doQuestionSubmitUsingPost({
+    ...form.value,
+    questionId: question.value?.id,
+  });
+  if (res.code === 0) {
+    message.success("提交成功");
+  } else {
+    message.error("提交失败：" + res.message);
+  }
+};
+const handleCodeChange = (v: string) => {
+  form.value.code = v;
+};
+</script>
+
+<template>
+  <div id="viewQuestionView">
+    <a-row :gutter="[24, 24]">
+      <a-col :md="12" :xs="24">
+        <a-tabs default-active-key="question">
+          <a-tab-pane key="question" title="题目详情">
+            <a-card v-if="question" :title="question.title">
+              <a-descriptions
+                title="判题条件"
+                :column="{ xs: 1, md: 2, lg: 3 }"
+              >
+                <a-descriptions-item label="时间限制">
+                  {{ question.judgeConfig.timeLimit ?? 0 }} ms
+                </a-descriptions-item>
+                <a-descriptions-item label="内存限制">
+                  {{ question.judgeConfig.memoryLimit ?? 0 }} KB
+                </a-descriptions-item>
+                <a-descriptions-item label="堆栈限制">
+                  {{ question.judgeConfig.stackLimit ?? 0 }} KB
+                </a-descriptions-item>
+              </a-descriptions>
+              <MdViewer :value="question?.content || ''" />
+              <template #extra>
+                <a-space wrap>
+                  <a-tag
+                    v-for="(tag, index) of question.tags"
+                    :key="index"
+                    color="green"
+                  >
+                    {{ tag }}
+                  </a-tag>
+                </a-space>
+              </template>
+            </a-card>
+          </a-tab-pane>
+          <a-tab-pane key="comment" title="评论">
+            <a-card>评论</a-card>
+          </a-tab-pane>
+          <a-tab-pane key="answer" title="答案">
+            <a-card> 暂时无法查看答案</a-card>
+          </a-tab-pane>
+        </a-tabs>
+      </a-col>
+      <a-col :md="12">
+        <a-space>
+          <a-form :model="form" layout="inline">
+            <a-form-item field="language" label="语言" style="min-width: 200px">
+              <a-select
+                v-model="form.language"
+                style="min-width: 320px"
+                placeholder="请选择编程语言"
+              >
+                <a-option value="java">Java</a-option>
+                <a-option value="go">Golang</a-option>
+                <a-option value="cpp">C++</a-option>
+              </a-select>
+            </a-form-item>
+          </a-form>
+          <a-button
+            type="primary"
+            style="min-width: 200px"
+            status="success"
+            @click="doSubmit"
+          >
+            提交代码
+          </a-button>
+        </a-space>
+        <a-divider size="0" />
+        <CodeEditor
+          style="min-height: 100px; height: 70vh"
+          :value="form.code"
+          :language="form.language"
+          :handle-change="handleCodeChange"
+        />
+      </a-col>
+    </a-row>
+  </div>
+</template>
+
+<style>
+#viewQuestionView {
+  margin: 0 auto;
+  max-width: 1400px;
+}
+
+#viewQuestionView .arco-space-horizontal .arco-space-item {
+  margin-bottom: 0 !important;
+}
+</style>
