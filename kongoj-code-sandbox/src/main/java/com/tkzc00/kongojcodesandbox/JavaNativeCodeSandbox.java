@@ -48,7 +48,7 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest) {
 
         // 设置安全管理器
-        System.setSecurityManager(new DefaultSecurityManager());
+//        System.setSecurityManager(new DefaultSecurityManager());
 
         List<String> inputList = executeCodeRequest.getInputList();
         String code = executeCodeRequest.getCode();
