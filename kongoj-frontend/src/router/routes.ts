@@ -33,6 +33,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/question/QuestionsView.vue"),
   },
   {
+    path: "/question_submit",
+    name: "浏览提交记录",
+    component: () => import("../views/question/QuestionSubmitView.vue"),
+  },
+  {
     path: "/view/question/:id",
     name: "查看题目",
     component: () => import("../views/question/ViewQuestionView.vue"),
