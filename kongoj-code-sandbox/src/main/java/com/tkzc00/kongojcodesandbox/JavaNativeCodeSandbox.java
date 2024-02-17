@@ -9,8 +9,8 @@ import com.tkzc00.kongojcodesandbox.model.ExecuteCodeRequest;
 import com.tkzc00.kongojcodesandbox.model.ExecuteCodeResponse;
 import com.tkzc00.kongojcodesandbox.model.ExecuteMessage;
 import com.tkzc00.kongojcodesandbox.model.JudgeInfo;
+import com.tkzc00.kongojcodesandbox.security.DefaultSecurityManager;
 import com.tkzc00.kongojcodesandbox.utils.ProcessUtils;
-import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -22,6 +22,8 @@ import java.util.UUID;
 public class JavaNativeCodeSandbox implements CodeSandbox {
     private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
     private static final String GLOBAL_JAVA_CLASS_NAME = "Main.java";
+    public static final String SECURITY_MANAGER_PATH = "classpath:/security";
+    public static final String SECURITY_MANAGER_CLASS_NAME = "MySecurityManager";
     private static final long TIME_OUT = 5000L;
     public static final List<String> BLACK_LIST = Arrays.asList("Files", "exec");
     public static final WordTree wordTree;
@@ -44,6 +46,10 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
 
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest) {
+
+        // 设置安全管理器
+        System.setSecurityManager(new DefaultSecurityManager());
+
         List<String> inputList = executeCodeRequest.getInputList();
         String code = executeCodeRequest.getCode();
         String language = executeCodeRequest.getLanguage();
@@ -79,7 +85,7 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
         // 3. 执行代码，得到执行结果
         List<ExecuteMessage> executeMessageList = new ArrayList<>();
         for (String inputArgs : inputList) {
-            String runCommand = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
+            String runCommand = String.format("java -Xmx256m -Dfile.encoding=UTF-8 -cp %s;%s -Djava.security.manager=%s Main %s", userCodeParentPath, SECURITY_MANAGER_PATH, SECURITY_MANAGER_CLASS_NAME, inputArgs);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCommand);
                 new Thread(() -> {
