@@ -3,11 +3,14 @@ package com.tkzc00.kongojcodesandbox;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.dfa.FoundWord;
+import cn.hutool.dfa.WordTree;
 import com.tkzc00.kongojcodesandbox.model.ExecuteCodeRequest;
 import com.tkzc00.kongojcodesandbox.model.ExecuteCodeResponse;
 import com.tkzc00.kongojcodesandbox.model.ExecuteMessage;
 import com.tkzc00.kongojcodesandbox.model.JudgeInfo;
 import com.tkzc00.kongojcodesandbox.utils.ProcessUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +23,14 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
     private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
     private static final String GLOBAL_JAVA_CLASS_NAME = "Main.java";
     private static final long TIME_OUT = 5000L;
+    public static final List<String> BLACK_LIST = Arrays.asList("Files", "exec");
+    public static final WordTree wordTree;
+
+    static {
+        // 初始化字典树
+        wordTree = new WordTree();
+        wordTree.addWords(BLACK_LIST);
+    }
 
     public static void main(String[] args) {
         JavaNativeCodeSandbox javaNativeCodeSandbox = new JavaNativeCodeSandbox();
@@ -36,6 +47,14 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
         List<String> inputList = executeCodeRequest.getInputList();
         String code = executeCodeRequest.getCode();
         String language = executeCodeRequest.getLanguage();
+
+        // 检验代码中是否包含黑名单中的非法关键字
+        FoundWord foundWord = wordTree.matchWord(code);
+        if (foundWord != null) {
+            System.out.println("代码中包含非法关键字：" + foundWord.getFoundWord());
+            return getErrorResponse(new RuntimeException("代码中包含非法关键字：" + foundWord.getFoundWord()));
+        }
+
         // 1. 把用户的代码保存为文件
         String userDir = System.getProperty("user.dir");
         String globalCodePathName = userDir + File.separator + GLOBAL_CODE_DIR_NAME;
