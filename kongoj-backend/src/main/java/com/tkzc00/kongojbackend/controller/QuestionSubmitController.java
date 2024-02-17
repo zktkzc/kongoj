@@ -26,8 +26,9 @@ import javax.servlet.http.HttpServletRequest;
  *
  */
 @RestController
-@RequestMapping("/question_submit")
+//@RequestMapping("/question_submit")
 @Slf4j
+@Deprecated
 public class QuestionSubmitController {
 
     @Resource
@@ -39,32 +40,32 @@ public class QuestionSubmitController {
     /**
      * 提交题目
      */
-    @PostMapping("/")
-    public BaseResponse<Long> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
-                                         HttpServletRequest request) {
-        if (questionSubmitAddRequest == null || questionSubmitAddRequest.getQuestionId() <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
-        // 登录才能点赞
-        final User loginUser = userService.getLoginUser(request);
-        long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
-        return ResultUtils.success(questionSubmitId);
-    }
-
-    /**
-     * 分页获取列表（除了管理员外，普通用户只能看到非答案、提交代码等公开信息）
-     *
-     * @param questionSubmitQueryRequest
-     * @return
-     */
-    @PostMapping("/list/page")
-    public BaseResponse<Page<QuestionSubmitVO>> listQuestionSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest, HttpServletRequest request) {
-        long current = questionSubmitQueryRequest.getCurrent();
-        long size = questionSubmitQueryRequest.getPageSize();
-        Page<QuestionSubmit> questionSubmitPage = questionSubmitService.page(new Page<>(current, size),
-                questionSubmitService.getQueryWrapper(questionSubmitQueryRequest));
-        User loginUser = userService.getLoginUser(request);
-        // 返回脱敏信息
-        return ResultUtils.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, loginUser));
-    }
+//    @PostMapping("/")
+//    public BaseResponse<Long> doQuestionSubmit(@RequestBody QuestionSubmitAddRequest questionSubmitAddRequest,
+//                                         HttpServletRequest request) {
+//        if (questionSubmitAddRequest == null || questionSubmitAddRequest.getQuestionId() <= 0) {
+//            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+//        }
+//        // 登录才能点赞
+//        final User loginUser = userService.getLoginUser(request);
+//        long questionSubmitId = questionSubmitService.doQuestionSubmit(questionSubmitAddRequest, loginUser);
+//        return ResultUtils.success(questionSubmitId);
+//    }
+//
+//    /**
+//     * 分页获取列表（除了管理员外，普通用户只能看到非答案、提交代码等公开信息）
+//     *
+//     * @param questionSubmitQueryRequest
+//     * @return
+//     */
+//    @PostMapping("/list/page")
+//    public BaseResponse<Page<QuestionSubmitVO>> listQuestionSubmitByPage(@RequestBody QuestionSubmitQueryRequest questionSubmitQueryRequest, HttpServletRequest request) {
+//        long current = questionSubmitQueryRequest.getCurrent();
+//        long size = questionSubmitQueryRequest.getPageSize();
+//        Page<QuestionSubmit> questionSubmitPage = questionSubmitService.page(new Page<>(current, size),
+//                questionSubmitService.getQueryWrapper(questionSubmitQueryRequest));
+//        User loginUser = userService.getLoginUser(request);
+//        // 返回脱敏信息
+//        return ResultUtils.success(questionSubmitService.getQuestionSubmitVOPage(questionSubmitPage, loginUser));
+//    }
 }
