@@ -1,5 +1,10 @@
 package com.tkzc00.kongojbackend.judge.codeSandbox.impl;
 
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONUtil;
+import com.tkzc00.kongojbackend.common.ErrorCode;
+import com.tkzc00.kongojbackend.exception.BusinessException;
 import com.tkzc00.kongojbackend.judge.codeSandbox.CodeSandbox;
 import com.tkzc00.kongojbackend.judge.codeSandbox.model.ExecuteCodeRequest;
 import com.tkzc00.kongojbackend.judge.codeSandbox.model.ExecuteCodeResponse;
@@ -10,7 +15,12 @@ import com.tkzc00.kongojbackend.judge.codeSandbox.model.ExecuteCodeResponse;
 public class RemoteCodeSandbox implements CodeSandbox {
     @Override
     public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest) {
-        System.out.println("远程代码沙箱");
-        return null;
+        String url = "http://localhost:8090/sandbox/executeCode";
+        String json = JSONUtil.toJsonStr(executeCodeRequest);
+        String response = HttpUtil.createPost(url).body(json).execute().body();
+        if (StrUtil.isBlank(response)) {
+            throw new BusinessException(ErrorCode.API_REQUEST_ERROR, "调用代码沙箱失败：" + response);
+        }
+        return JSONUtil.toBean(response, ExecuteCodeResponse.class);
     }
 }

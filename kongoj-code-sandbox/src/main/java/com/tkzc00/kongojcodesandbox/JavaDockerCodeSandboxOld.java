@@ -1,7 +1,9 @@
 package com.tkzc00.kongojcodesandbox;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.dfa.FoundWord;
 import cn.hutool.dfa.WordTree;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
@@ -12,7 +14,8 @@ import com.github.dockerjava.core.command.ExecStartResultCallback;
 import com.tkzc00.kongojcodesandbox.model.ExecuteCodeRequest;
 import com.tkzc00.kongojcodesandbox.model.ExecuteCodeResponse;
 import com.tkzc00.kongojcodesandbox.model.ExecuteMessage;
-import org.springframework.stereotype.Component;
+import com.tkzc00.kongojcodesandbox.model.JudgeInfo;
+import com.tkzc00.kongojcodesandbox.utils.ProcessUtils;
 import org.springframework.util.StopWatch;
 
 import java.io.Closeable;
@@ -22,10 +25,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-@Component
-public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
+public class JavaDockerCodeSandboxOld implements CodeSandbox {
+    private static final String GLOBAL_CODE_DIR_NAME = "tmpCode";
+    private static final String GLOBAL_JAVA_CLASS_NAME = "Main.java";
+    public static final String SECURITY_MANAGER_PATH = "classpath:/security";
+    public static final String SECURITY_MANAGER_CLASS_NAME = "MySecurityManager";
     private static final long TIME_OUT = 5000L;
     public static final List<String> BLACK_LIST = Arrays.asList("Files", "exec");
     public static final WordTree wordTree;
@@ -38,7 +45,7 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
     }
 
     public static void main(String[] args) {
-        JavaDockerCodeSandbox javaNativeCodeSandbox = new JavaDockerCodeSandbox();
+        JavaDockerCodeSandboxOld javaNativeCodeSandbox = new JavaDockerCodeSandboxOld();
         ExecuteCodeRequest executeCodeRequest = new ExecuteCodeRequest();
         String code = ResourceUtil.readStr("classpath:/testCode/simpleComputeArgs/Main.java", StandardCharsets.UTF_8);
         executeCodeRequest.setCode(code);
@@ -47,16 +54,46 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
         System.out.println("executeCodeResponse = " + executeCodeResponse);
     }
 
-    /**
-     * 使用Docker运行代码
-     *
-     * @param userCodeFile 用户代码文件
-     * @param inputList    输入用例列表
-     * @return 执行结果列表
-     */
     @Override
-    public List<ExecuteMessage> runFile(File userCodeFile, List<String> inputList) {
-        String userCodeParentPath = userCodeFile.getParentFile().getAbsolutePath();
+    public ExecuteCodeResponse executeCode(ExecuteCodeRequest executeCodeRequest) {
+
+        // 设置安全管理器
+//        System.setSecurityManager(new DefaultSecurityManager());
+
+        List<String> inputList = executeCodeRequest.getInputList();
+        String code = executeCodeRequest.getCode();
+        String language = executeCodeRequest.getLanguage();
+
+        // 检验代码中是否包含黑名单中的非法关键字
+        FoundWord foundWord = wordTree.matchWord(code);
+        if (foundWord != null) {
+            System.out.println("代码中包含非法关键字：" + foundWord.getFoundWord());
+            return getErrorResponse(new RuntimeException("代码中包含非法关键字：" + foundWord.getFoundWord()));
+        }
+
+        // 1. 把用户的代码保存为文件
+        String userDir = System.getProperty("user.dir");
+        String globalCodePathName = userDir + File.separator + GLOBAL_CODE_DIR_NAME;
+        // 判断全局代码目录是否存在
+        if (!FileUtil.exist(globalCodePathName)) {
+            FileUtil.mkdir(globalCodePathName);
+        }
+        // 把用户的代码隔离存放
+        String userCodeParentPath = globalCodePathName + File.separator + UUID.randomUUID();
+        String userCodePath = userCodeParentPath + File.separator + GLOBAL_JAVA_CLASS_NAME;
+        File userCodeFile = FileUtil.writeString(code, userCodePath, StandardCharsets.UTF_8);
+        // 2. 编译代码，得到class文件
+        ExecuteMessage compileMessage = null;
+        try {
+            String compileCommand = String.format("javac -encoding utf-8 %s", userCodeFile.getAbsolutePath());
+            Process compileProcess = Runtime.getRuntime().exec(compileCommand);
+            compileMessage = ProcessUtils.runProcessAndGetMessage(compileProcess, "编译");
+        } catch (Exception e) {
+            return getErrorResponse(e);
+        }
+        System.out.println("编译输出：" + compileMessage);
+
+        // 3. 创建容器，把文件复制到容器内
         // 获取默认的DockerClient
         DockerClient dockerClient = DockerClientBuilder.getInstance().build();
 
@@ -86,6 +123,7 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
         hostConfig.setBinds(new Bind(userCodeParentPath, new Volume("/app")));
         hostConfig.withMemory(100 * 1000 * 1000L);
         hostConfig.withMemorySwap(0L);
+        hostConfig.withSecurityOpts(Arrays.asList("seccomp=安全管理配置字符串"));
         hostConfig.withCpuCount(1L);
         CreateContainerResponse createContainerResponse = containerCmd
                 .withHostConfig(hostConfig)
@@ -193,6 +231,23 @@ public class JavaDockerCodeSandbox extends JavaCodeSandboxTemplate {
             executeMessage.setMemory(maxMemory[0]);
             executeMessageList.add(executeMessage);
         }
-        return executeMessageList;
+
+        ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
+        return executeCodeResponse;
+    }
+
+    /**
+     * 获取错误响应
+     *
+     * @param e 异常
+     * @return 错误响应
+     */
+    private ExecuteCodeResponse getErrorResponse(Throwable e) {
+        ExecuteCodeResponse executeCodeResponse = new ExecuteCodeResponse();
+        executeCodeResponse.setStatus(2);
+        executeCodeResponse.setMessage(e.getMessage());
+        executeCodeResponse.setJudgeInfo(new JudgeInfo());
+        executeCodeResponse.setOutputList(new ArrayList<>());
+        return executeCodeResponse;
     }
 }
