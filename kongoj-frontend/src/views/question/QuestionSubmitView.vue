@@ -37,6 +37,7 @@ const columns = [
   {
     title: "判题状态",
     dataIndex: "status",
+    slotName: "status",
   },
   {
     title: "题目 ID",
@@ -162,6 +163,19 @@ const doSubmit = () => {
             : JSON.stringify(record.judgeInfo.memory).replaceAll('"', "")
         }}
         KB
+      </template>
+      <template #status="{ record }">
+        {{
+          record.status === 0
+            ? "等待判题"
+            : record.status === 1
+            ? "判题中"
+            : record.status === 2
+            ? "判题完成"
+            : record.status === 3
+            ? "判题失败"
+            : "未知状态"
+        }}
       </template>
     </a-table>
   </div>
