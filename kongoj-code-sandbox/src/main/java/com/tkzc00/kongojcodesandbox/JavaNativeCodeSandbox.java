@@ -63,6 +63,16 @@ public class JavaNativeCodeSandbox implements CodeSandbox {
             String runCommand = String.format("java -Dfile.encoding=UTF-8 -cp %s Main %s", userCodeParentPath, inputArgs);
             try {
                 Process runProcess = Runtime.getRuntime().exec(runCommand);
+                new Thread(() -> {
+                    try {
+                        // 超时强制结束
+                        Thread.sleep(TIME_OUT);
+                        System.out.println("程序超时，强制结束");
+                        runProcess.destroy();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).start();
                 ExecuteMessage executeMessage = ProcessUtils.runProcessAndGetMessage(runProcess, "运行");
                 System.out.println("运行输出：" + executeMessage);
                 executeMessageList.add(executeMessage);
